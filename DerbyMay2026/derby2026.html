@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Putnam Estate – Kentucky Derby Pool 2026</title>
+
+        <!--
+            Kentucky Derby Pool – Putnam Estate 2026
+            Modern Sports Betting Theme
+            Firebase Realtime Database version
+
+            Data is stored in Firebase Realtime Database.
+            All devices connected to the same Firebase project
+            see the same entries and odds board in real time.
+
+            Firebase data structure:
+              derby-pool/
+                entries/
+                  0: { name, horse, odds }
+                  1: { name, horse, odds }
+                  ...
+                pickedHorses/
+                  0: 8
+                  1: 17
+                  ...
+
+            Admin buttons:
+              Next Round          – removes pickedHorses from Firebase
+                                    entries stay on screen
+                                    duplicate tickets still blocked
+
+              Clear All & Restart – removes entire derby-pool node
+                                    wipes everything completely
+
+            Setup:
+              1. Create a Firebase project at console.firebase.google.com
+              2. Add a Realtime Database in test mode
+              3. Replace the firebaseConfig values in derby5-1-25.js
+                 with your own project credentials
+
+            Missing post positions:
+              #13 and #20 are not in the 2026 official entry list
+        -->
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap"
+              rel="stylesheet">
+
+        <!-- Font Awesome icons -->
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <!-- Stylesheet -->
+        <link rel="stylesheet" href="css/cscie3.css" type="text/css">
+    </head>
+
+    <body>
+
+        <!-- ═══════════════════════════════════════
+             HEADER
+        ════════════════════════════════════════ -->
+        <header>
+            <div class="header-inner">
+
+                <div class="header-left">
+                    <img id="derbylogo"
+                         src="images/kd_woodford.webp"
+                         alt="Kentucky Derby">
+                </div>
+
+                <div class="header-center">
+                    <h1 class="site-title">Putnam Estate</h1>
+                    <p class="site-subtitle">
+                        Kentucky Derby Pool &bull; 2026
+                    </p>
+                </div>
+
+                <div class="header-right">
+                    <span class="live-badge">
+                        <i class="fas fa-circle"></i> Live
+                    </span>
+                    <img class="heading"
+                         id="estatelogo"
+                         src="images/PutnamEstate.gif"
+                         alt="Putnam Estate">
+                </div>
+
+            </div>
+        </header>
+
+
+        <!-- ═══════════════════════════════════════
+             MAIN CONTENT – Two column grid
+        ════════════════════════════════════════ -->
+        <main class="main-content">
+
+
+            <!-- ─────────────────────────────────
+                 LEFT PANEL
+            ──────────────────────────────────── -->
+            <div class="left">
+
+
+                <!-- ── Entry Form Card ──────────────────── -->
+                <section class="card" id="entry-card">
+
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-ticket-alt"></i>
+                            Enter the Pool
+                        </h2>
+                        <span class="card-badge">$20 per ticket</span>
+                    </div>
+
+                    <div class="card-body">
+                        <form id="entryForm">
+
+                            <div class="form-group">
+                                <label for="name">
+                                    Last 4 Digits of Your Ticket
+                                </label>
+                                <div class="input-row">
+                                    <input type="text"
+                                           id="name"
+                                           maxlength="4"
+                                           class="enterText"
+                                           placeholder="1234"
+                                           required/>
+                                </div>
+                                <!-- Feedback message – controlled by JS -->
+                                <span id="spanName"></span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button id="pick"
+                                        class="button btn-pick"
+                                        type="reset">
+                                    <i class="fas fa-horse"></i>
+                                    Pick My Horse
+                                </button>
+                                <div class="venmo-wrap">
+                                    <p class="venmo-label">Pay via Venmo</p>
+                                    <img src="images/venmo.png"
+                                         alt="Pay via Venmo"
+                                         class="venmo-img">
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </section>
+                <!-- END Entry Form Card -->
+
+
+                <!-- ── Entries List Card ─────────────────── -->
+                <section class="card" id="drawing-card">
+
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-list-ol"></i>
+                            Entries
+                        </h2>
+                        <!--
+                            Entry count – updated in real time by JS.
+                            Reflects total entries across all rounds.
+                        -->
+                        <span class="card-badge" id="entry-count">
+                            0 entries
+                        </span>
+                    </div>
+
+                    <!--
+                        #drawing is used by the JS fadeOut/fadeIn
+                        animation that plays when a horse is picked.
+                    -->
+                    <div id="drawing">
+
+                        <!--
+                            Three column headers:
+                              Col 1 – Ticket #  (20%)
+                              Col 2 – Horse     (45%)
+                              Col 3 – Odds      (35%)
+                        -->
+                        <div class="entries-header" id="infoHead">
+                            <div>Ticket #</div>
+                            <div>Horse</div>
+                            <div>Odds</div>
+                        </div>
+
+                        <!-- Entry rows appended here by JS -->
+                        <div id="output"></div>
+
+                    </div>
+
+                </section>
+                <!-- END Entries List Card -->
+
+
+                <!--
+                    Horse number reveal.
+                    Hidden by default – JS fadeIn/fadeOut controls
+                    visibility when a horse is picked.
+                -->
+                <div id="chickenDinner"></div>
+
+
+                <!-- ── Take Your Shot Card ───────────────── -->
+                <section class="card" id="shots-card">
+
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-glass-cheers"></i>
+                            Take Your Shot
+                        </h2>
+                    </div>
+
+                    <div class="card-body" id="TakeShots">
+                        <img class="shots"
+                             src="images/TakeYourShot.jpg"
+                             width="384"
+                             height="256"
+                             alt="Take Your Shot">
+                        <img class="SoupShooter"
+                             src="images/SoupShooter.gif"
+                             width="384"
+                             height="256"
+                             alt="S&amp;S Entertainment">
+                    </div>
+
+                </section>
+                <!-- END Take Your Shot Card -->
+
+
+            </div>
+            <!-- END LEFT PANEL -->
+
+
+            <!-- ─────────────────────────────────
+                 RIGHT PANEL
+            ──────────────────────────────────── -->
+            <div class="right">
+
+
+                <!-- ── Odds Board Card ──────────────────── -->
+                <section class="card" id="odds-card">
+
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-chart-line"></i>
+                            Live Odds Board
+                        </h2>
+                        <span class="live-badge-sm">
+                            <i class="fas fa-circle"></i> Live
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="odds-subheader">
+                            <span>
+                                22 horses &bull;
+                                Post time 6:57pm ET &bull;
+                                #13 &amp; #20 not entered
+                            </span>
+                            <span id="oddsUpdated"></span>
+                        </div>
+
+                        <!--
+                            Horse list – 22 official runners.
+                            Post positions #13 and #20 are not
+                            in the 2026 official entry list
+                            and are omitted here and in horseData.
+
+                            Each row structure:
+                              .horse-num  – post position badge
+                              .horse-name – horse name
+                              .horse-odds – morning line odds badge
+
+                            JS reads parseInt(h3.text()) to get the
+                            post position for taken/available logic.
+                            e.g. "8So Happy6/1" → parseInt → 8
+                        -->
+                        <ul id="runningHorses">
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">1</span>
+                                    <span class="horse-name">Renegade</span>
+                                    <span class="horse-odds">5/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">2</span>
+                                    <span class="horse-name">Albus</span>
+                                    <span class="horse-odds">50/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">3</span>
+                                    <span class="horse-name">Intrepido</span>
+                                    <span class="horse-odds">55/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">4</span>
+                                    <span class="horse-name">Litmus Test</span>
+                                    <span class="horse-odds">34/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">5</span>
+                                    <span class="horse-name">Right To Party</span>
+                                    <span class="horse-odds">26/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">6</span>
+                                    <span class="horse-name">Commandment</span>
+                                    <span class="horse-odds">7/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">7</span>
+                                    <span class="horse-name">Danon Bourbon</span>
+                                    <span class="horse-odds">14/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">8</span>
+                                    <span class="horse-name">So Happy</span>
+                                    <span class="horse-odds">6/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">9</span>
+                                    <span class="horse-name">The Puma</span>
+                                    <span class="horse-odds">8/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">10</span>
+                                    <span class="horse-name">Wonder Dean</span>
+                                    <span class="horse-odds">20/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">11</span>
+                                    <span class="horse-name">Incredibolt</span>
+                                    <span class="horse-odds">27/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">12</span>
+                                    <span class="horse-name">Chief Wallabee</span>
+                                    <span class="horse-odds">9/1</span>
+                                </h3>
+                            </li>
+
+                            <!-- #13 not in official entry list – omitted -->
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">14</span>
+                                    <span class="horse-name">Potente</span>
+                                    <span class="horse-odds">23/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">15</span>
+                                    <span class="horse-name">Emerging Market</span>
+                                    <span class="horse-odds">11/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">16</span>
+                                    <span class="horse-name">Pavlovian</span>
+                                    <span class="horse-odds">52/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">17</span>
+                                    <span class="horse-name">Six Speed</span>
+                                    <span class="horse-odds">40/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">18</span>
+                                    <span class="horse-name">Further Ado</span>
+                                    <span class="horse-odds">7/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">19</span>
+                                    <span class="horse-name">Golden Tempo</span>
+                                    <span class="horse-odds">36/1</span>
+                                </h3>
+                            </li>
+
+                            <!-- #20 not in official entry list – omitted -->
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">21</span>
+                                    <span class="horse-name">Great White</span>
+                                    <span class="horse-odds">29/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">22</span>
+                                    <span class="horse-name">Ocelli</span>
+                                    <span class="horse-odds">50/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">23</span>
+                                    <span class="horse-name">Robusta</span>
+                                    <span class="horse-odds">50/1</span>
+                                </h3>
+                            </li>
+
+                            <li class="leaderboard">
+                                <h3>
+                                    <span class="horse-num">24</span>
+                                    <span class="horse-name">Corona De Oro</span>
+                                    <span class="horse-odds">50/1</span>
+                                </h3>
+                            </li>
+
+                        </ul>
+
+                        <p class="odds-link">
+                            <a href="https://www.kentuckyderby.com/derby-horses/"
+                               target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                Official Derby Horse List
+                            </a>
+                        </p>
+
+                    </div>
+
+                </section>
+                <!-- END Odds Board Card -->
+
+
+                <!-- ── Admin Control Card ───────────────── -->
+                <section class="card" id="admin-card">
+
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-lock"></i>
+                            Admin Controls
+                        </h2>
+                    </div>
+
+                    <div class="card-body">
+                        <div id="control">
+                            <div id="adminForm">
+                                <form>
+
+                                    <div class="admin-input-row">
+                                        <input id="adminKey2"
+                                               type="password"
+                                               placeholder="Admin Password"
+                                               required/>
+                                    </div>
+
+                                    <div class="admin-btn-row">
+
+                                        <!--
+                                            Next Round:
+                                            Removes pickedHorses from Firebase.
+                                            All horses available to pick again.
+                                            Entries stay on screen.
+                                            Duplicate tickets still blocked.
+                                        -->
+                                        <button id="doit"
+                                                class="button btn-round">
+                                            <i class="fas fa-redo"></i>
+                                            Next Round
+                                        </button>
+
+                                        <!--
+                                            Clear All & Restart:
+                                            Removes entire derby-pool node
+                                            from Firebase. Wipes everything –
+                                            display, entries, horses, ticket
+                                            history. Cannot be undone.
+                                        -->
+                                        <button id="clearAll"
+                                                class="button button-danger btn-clear">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Clear All &amp; Restart
+                                        </button>
+
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+                <!-- END Admin Control Card -->
+
+
+            </div>
+            <!-- END RIGHT PANEL -->
+
+
+        </main>
+
+
+        <!-- ═══════════════════════════════════════
+             FOOTER
+        ════════════════════════════════════════ -->
+        <footer>
+            <p>
+                &copy; 2026 Putnam Estate
+                &bull; Kentucky Derby Pool
+                &bull; 22 Horses
+                &bull; #13 &amp; #20 Not Entered
+                &bull; Good luck! 🏇
+            </p>
+        </footer>
+
+
+        <!-- ═══════════════════════════════════════
+             SCRIPTS
+
+             Load order is important:
+               1. Firebase App    – must be first
+               2. Firebase DB     – must be before derby JS
+               3. jQuery          – must be before derby JS
+               4. derby5-1-25.js  – app logic, loaded last
+
+             Firebase v8 SDK is used for compatibility
+             with the existing jQuery-based codebase.
+             Do not swap for v9+ without refactoring the
+             JS file to use the modular import syntax.
+        ════════════════════════════════════════ -->
+
+        <!-- 1. Firebase App SDK v8 -->
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+        <!-- 2. Firebase Realtime Database SDK v8 -->
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+        <!-- 3. jQuery -->
+        <script type="text/javascript" src="js/jquery-4.js"></script>
+
+        <!-- 4. App logic -->
+        <script type="text/javascript" src="js/derby5-1-26.js"></script>
+
+    </body>
+</html>

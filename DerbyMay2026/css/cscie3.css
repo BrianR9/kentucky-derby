@@ -1,0 +1,982 @@
+/* ============================================================
+   Kentucky Derby 2026 – Putnam Estate Pool
+   cscie3.css – Modern Sports Betting Theme
+   ============================================================ */
+
+
+/* ── CSS Design Tokens ────────────────────────────────────── */
+:root {
+    /* Backgrounds */
+    --bg-page:          #0a0e1a;
+    --bg-card:          #111827;
+    --bg-card-alt:      #1a2235;
+    --bg-hover:         #1f2a42;
+    --bg-input:         #0f172a;
+
+    /* Borders */
+    --border:           #2d3748;
+    --border-light:     #374151;
+
+    /* Accent – gold (Derby theme) */
+    --gold:             #f59e0b;
+    --gold-light:       #fcd34d;
+    --gold-dark:        #d97706;
+    --gold-glow:        rgba(245, 158, 11, 0.25);
+
+    /* Accent – green (betting theme) */
+    --green:            #10b981;
+    --green-dark:       #059669;
+    --green-glow:       rgba(16, 185, 129, 0.2);
+
+    /* Accent – red (danger) */
+    --red:              #ef4444;
+    --red-dark:         #dc2626;
+    --red-glow:         rgba(239, 68, 68, 0.25);
+
+    /* Text hierarchy */
+    --text-1:           #f9fafb;
+    --text-2:           #d1d5db;
+    --text-3:           #9ca3af;
+    --text-4:           #6b7280;
+
+    /* Shadows */
+    --shadow-sm:        0 1px 3px  rgba(0, 0, 0, 0.5);
+    --shadow-md:        0 4px 16px rgba(0, 0, 0, 0.6);
+    --shadow-lg:        0 8px 32px rgba(0, 0, 0, 0.7);
+
+    /* Border radius */
+    --radius-sm:        6px;
+    --radius-md:        12px;
+    --radius-lg:        16px;
+
+    /* Transitions */
+    --transition:       all 0.2s ease;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin:     0;
+    padding:    0;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BASE
+════════════════════════════════════════════════════════════ */
+html {
+    background-color: var(--bg-page);
+    scroll-behavior:  smooth;
+}
+
+body {
+    font-family:      'Inter', helvetica, sans-serif;
+    background-color: var(--bg-page);
+    background-image: radial-gradient(
+        ellipse at top,
+        #111827 0%,
+        var(--bg-page) 60%
+    );
+    color:      var(--text-1);
+    min-height: 100vh;
+    font-size:  14px;
+    line-height: 1.5;
+}
+
+/* Hide unused elements */
+#emailLabel { display: none; }
+
+
+/* ════════════════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════════════════ */
+header {
+    background: linear-gradient(
+        135deg,
+        #0f172a 0%,
+        #1a2235 50%,
+        #0f172a 100%
+    );
+    border-bottom: 2px solid var(--gold);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.8),
+        0 2px 8px  var(--gold-glow);
+    position: sticky;
+    top:      0;
+    z-index:  100;
+}
+
+.header-inner {
+    max-width:       1200px;
+    margin:          0 auto;
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    padding:         12px 24px;
+    gap:             20px;
+}
+
+.header-left {
+    display:     flex;
+    align-items: center;
+}
+
+.header-center {
+    text-align: center;
+    flex:       1;
+}
+
+.header-right {
+    display:     flex;
+    align-items: center;
+    gap:         16px;
+}
+
+#derbylogo {
+    width:  120px;
+    height: auto;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+#estatelogo {
+    height:        50px;
+    width:         auto;
+    border-radius: var(--radius-sm);
+}
+
+/* Override old .heading float styles */
+.heading {
+    box-shadow:      none;
+    background-color: transparent;
+}
+
+/* Site title */
+.site-title {
+    font-family:     'Rajdhani', sans-serif;
+    font-size:       2rem;
+    font-weight:     700;
+    color:           var(--gold);
+    letter-spacing:  4px;
+    text-transform:  uppercase;
+    line-height:     1;
+    text-shadow:     0 0 20px var(--gold-glow);
+    margin:          0;
+    text-align:      center;
+}
+
+.site-subtitle {
+    font-size:      0.75rem;
+    color:          var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top:     4px;
+}
+
+/* Live indicator badge – header */
+.live-badge {
+    display:          inline-flex;
+    align-items:      center;
+    gap:              6px;
+    background-color: rgba(239, 68, 68, 0.12);
+    color:            var(--red);
+    border:           1px solid rgba(239, 68, 68, 0.4);
+    border-radius:    20px;
+    padding:          4px 12px;
+    font-size:        0.7rem;
+    font-weight:      700;
+    letter-spacing:   1.5px;
+    text-transform:   uppercase;
+    white-space:      nowrap;
+}
+
+/* Small live badge – card headers */
+.live-badge-sm {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            4px;
+    color:          var(--red);
+    font-size:      0.65rem;
+    font-weight:    700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Pulsing dot on both live badges */
+.live-badge .fa-circle,
+.live-badge-sm .fa-circle {
+    font-size: 0.45rem;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   MAIN LAYOUT – CSS Grid
+════════════════════════════════════════════════════════════ */
+.main-content {
+    max-width:             1200px;
+    margin:                0 auto;
+    display:               grid;
+    grid-template-columns: 1fr 1fr;
+    gap:                   24px;
+    padding:               24px;
+}
+
+/* Override old float-based .left and .right */
+.left,
+.right {
+    float:          none;
+    width:          100%;
+    display:        flex;
+    flex-direction: column;
+    gap:            20px;
+}
+
+/* Footer */
+footer {
+    max-width:  1200px;
+    margin:     0 auto;
+    padding:    24px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    clear:      both;
+}
+
+footer p {
+    color:     var(--text-4);
+    font-size: 0.8rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   CARD COMPONENT
+════════════════════════════════════════════════════════════ */
+.card {
+    background-color: var(--bg-card);
+    border:           1px solid var(--border);
+    border-radius:    var(--radius-lg);
+    overflow:         hidden;
+    box-shadow:       var(--shadow-md);
+    transition:       var(--transition);
+}
+
+.card:hover {
+    border-color: var(--border-light);
+    box-shadow:   var(--shadow-lg);
+}
+
+/* Card header bar */
+.card-header {
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    padding:         14px 20px;
+    border-bottom:   1px solid var(--border);
+    background:      linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.07) 0%,
+        transparent 100%
+    );
+}
+
+.card-header h2 {
+    font-family:    'Rajdhani', sans-serif;
+    font-size:      1rem;
+    font-weight:    700;
+    color:          var(--text-1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display:        flex;
+    align-items:    center;
+    gap:            10px;
+    margin:         0;
+    text-align:     left;
+}
+
+.card-header h2 i {
+    color:     var(--gold);
+    font-size: 0.9rem;
+}
+
+/* Pill badge */
+.card-badge {
+    background-color: rgba(245, 158, 11, 0.12);
+    color:            var(--gold);
+    border:           1px solid rgba(245, 158, 11, 0.3);
+    border-radius:    20px;
+    padding:          3px 12px;
+    font-size:        0.7rem;
+    font-weight:      600;
+    letter-spacing:   0.5px;
+    white-space:      nowrap;
+}
+
+/* Card body */
+.card-body {
+    padding: 20px;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ENTRY FORM
+════════════════════════════════════════════════════════════ */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display:        block;
+    color:          var(--text-3);
+    font-size:      0.7rem;
+    font-weight:    600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom:  10px;
+}
+
+.input-row {
+    display:     flex;
+    gap:         10px;
+    align-items: center;
+}
+
+/* Ticket number input */
+.enterText {
+    background-color: var(--bg-input);
+    border:           2px solid var(--border);
+    border-radius:    var(--radius-sm);
+    color:            var(--text-1);
+    font-size:        1.6rem;
+    font-family:      'Rajdhani', sans-serif;
+    font-weight:      700;
+    letter-spacing:   10px;
+    padding:          12px 16px;
+    width:            160px;
+    text-align:       center;
+    transition:       var(--transition);
+    outline:          none;
+    display:          block;
+}
+
+.enterText:focus {
+    border-color:     var(--gold);
+    box-shadow:       0 0 0 3px var(--gold-glow);
+    background-color: #0d1526;
+}
+
+.enterText::placeholder {
+    color:          var(--text-4);
+    letter-spacing: 6px;
+    font-size:      1rem;
+}
+
+/* Feedback span */
+#spanName {
+    display:       block;
+    min-height:    28px;
+    margin-top:    10px;
+    font-size:     0.8rem;
+    font-weight:   600;
+    padding:       6px 12px;
+    border-radius: var(--radius-sm);
+    transition:    var(--transition);
+    letter-spacing: 0.3px;
+}
+
+/* Form actions row – button + venmo side by side */
+.form-actions {
+    display:     flex;
+    align-items: center;
+    gap:         24px;
+    margin-top:  8px;
+    flex-wrap:   wrap;
+}
+
+/* Venmo block */
+.venmo-wrap {
+    display:        flex;
+    flex-direction: column;
+    align-items:    center;
+    gap:            4px;
+}
+
+.venmo-label {
+    font-size:      0.65rem;
+    color:          var(--text-4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.venmo-img {
+    height:        80px;
+    width:         auto;
+    border-radius: var(--radius-sm);
+    border:        1px solid var(--border);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BUTTONS
+════════════════════════════════════════════════════════════ */
+
+/* ── Base button – resets all old styles ──────────────────── */
+.button {
+    display:         inline-flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             8px;
+    font-family:     'Rajdhani', sans-serif;
+    font-size:       0.95rem;
+    font-weight:     700;
+    letter-spacing:  1.5px;
+    text-transform:  uppercase;
+    border-radius:   var(--radius-md);
+    border:          none;
+    cursor:          pointer;
+    transition:      var(--transition);
+    padding:         0 24px;
+    height:          50px;
+    white-space:     nowrap;
+    text-decoration: none;
+    outline:         none;
+    position:        relative;
+    overflow:        hidden;
+
+    /* Reset old inherited styles */
+    line-height:        normal;
+    width:              auto;
+    text-shadow:        none;
+    filter:             none;
+    margin:             0;
+    -moz-box-shadow:    none;
+    -webkit-box-shadow: none;
+    box-shadow:         none;
+    background-image:   none;
+}
+
+/* ── Pick My Horse – gold ─────────────────────────────────── */
+.btn-pick {
+    background: linear-gradient(
+        135deg,
+        var(--gold)      0%,
+        var(--gold-dark) 100%
+    );
+    color:      #0a0e1a;
+    box-shadow: 0 4px 16px var(--gold-glow);
+    min-width:  190px;
+}
+
+.btn-pick:hover {
+    background: linear-gradient(
+        135deg,
+        var(--gold-light) 0%,
+        var(--gold)       100%
+    );
+    transform:  translateY(-2px);
+    box-shadow: 0 6px 24px rgba(245, 158, 11, 0.5);
+    color:      #0a0e1a;
+}
+
+.btn-pick:active {
+    transform:  translateY(0);
+    box-shadow: 0 2px 8px var(--gold-glow);
+}
+
+/* ── Next Round – green ───────────────────────────────────── */
+.btn-round {
+    background: linear-gradient(
+        135deg,
+        var(--green)      0%,
+        var(--green-dark) 100%
+    );
+    color:      #fff;
+    box-shadow: 0 4px 16px var(--green-glow);
+}
+
+.btn-round:hover {
+    background: linear-gradient(
+        135deg,
+        #34d399      0%,
+        var(--green) 100%
+    );
+    transform:  translateY(-2px);
+    box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4);
+    color:      #fff;
+}
+
+.btn-round:active {
+    transform: translateY(0);
+}
+
+/* ── Clear All & Restart – red ────────────────────────────── */
+.button-danger,
+.btn-clear {
+    background: linear-gradient(
+        135deg,
+        var(--red)      0%,
+        var(--red-dark) 100%
+    );
+    color:              #fff;
+    border:             none;
+    text-shadow:        none;
+    -moz-box-shadow:    0 4px 16px var(--red-glow);
+    -webkit-box-shadow: 0 4px 16px var(--red-glow);
+    box-shadow:         0 4px 16px var(--red-glow);
+}
+
+.button-danger:hover,
+.btn-clear:hover {
+    background: linear-gradient(
+        135deg,
+        #f87171    0%,
+        var(--red) 100%
+    );
+    transform:  translateY(-2px);
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4);
+    color:      #fff;
+}
+
+.button-danger:active,
+.btn-clear:active {
+    transform: translateY(0);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ENTRY DISPLAY – THREE COLUMN LAYOUT
+   Col 1 – Ticket #  (20%)
+   Col 2 – Horse     (45%)
+   Col 3 – Odds      (35%)
+════════════════════════════════════════════════════════════ */
+
+/* Scrollable entries container */
+#drawing {
+    padding:    0;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+#drawing::-webkit-scrollbar       { width: 4px; }
+#drawing::-webkit-scrollbar-track { background: transparent; }
+#drawing::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius:    4px;
+}
+
+/* ── Column header row ────────────────────────────────────── */
+.entries-header,
+#infoHead {
+    display:         flex;
+    align-items:     center;
+    padding:         10px 16px;
+    background:      linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.1)  0%,
+        rgba(245, 158, 11, 0.04) 100%
+    );
+    border-bottom:   1px solid var(--border);
+    position:        sticky;
+    top:             0;
+    z-index:         10;
+}
+
+/* Shared header cell styles */
+.entries-header > div,
+#infoHead > div {
+    font-size:      0.65rem;
+    font-weight:    700;
+    color:          var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Header column widths */
+.entries-header > div:nth-child(1),
+#infoHead > div:nth-child(1) { width: 20%; }
+
+.entries-header > div:nth-child(2),
+#infoHead > div:nth-child(2) { width: 45%; }
+
+.entries-header > div:nth-child(3),
+#infoHead > div:nth-child(3) { width: 35%; }
+
+/* ── Data rows ────────────────────────────────────────────── */
+.info {
+    display:       flex;
+    align-items:   center;
+    padding:       10px 16px;
+    border-bottom: 1px solid rgba(45, 55, 72, 0.4);
+    transition:    var(--transition);
+}
+
+.info:last-child {
+    border-bottom: none;
+}
+
+/* Shared data cell styles */
+.info > div {
+    font-size:   0.9rem;
+    font-weight: 500;
+    color:       var(--text-2);
+}
+
+/* Col 1 – ticket number */
+.info > div:nth-child(1) {
+    width:          20%;
+    font-family:    'Rajdhani', sans-serif;
+    font-size:      1.15rem;
+    font-weight:    700;
+    color:          var(--gold);
+    letter-spacing: 3px;
+}
+
+/* Col 2 – horse name */
+.info > div:nth-child(2) {
+    width:       45%;
+    color:       var(--text-1);
+    font-weight: 600;
+}
+
+/* Col 3 – odds cell wrapper */
+.info > div:nth-child(3) {
+    width: 35%;
+}
+
+/* Odds badge inside entries list */
+.entry-odds {
+    display:          inline-flex;
+    align-items:      center;
+    justify-content:  center;
+    background-color: rgba(16, 185, 129, 0.1);
+    color:            var(--green);
+    border:           1px solid rgba(16, 185, 129, 0.25);
+    border-radius:    var(--radius-sm);
+    font-family:      'Rajdhani', sans-serif;
+    font-size:        0.88rem;
+    font-weight:      700;
+    padding:          2px 12px;
+    letter-spacing:   0.5px;
+    white-space:      nowrap;
+}
+
+/* Alternating row colours */
+#output .info:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+#output .info:nth-child(odd) {
+    background-color: transparent;
+}
+
+#output .info:hover {
+    background-color: rgba(245, 158, 11, 0.05);
+    cursor:           default;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   NEW ENTRY FLASH ANIMATION
+════════════════════════════════════════════════════════════ */
+@keyframes flashGold {
+    0%   { background-color: rgba(245, 158, 11, 0.3); }
+    100% { background-color: transparent; }
+}
+
+.new-entry {
+    animation: flashGold 2s ease-out;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   HORSE NUMBER REVEAL
+════════════════════════════════════════════════════════════ */
+#chickenDinner {
+    display:     none; /* shown/hidden by JS fadeIn/fadeOut */
+    text-align:  center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size:   130px;
+    font-weight: 900;
+    color:       var(--gold);
+    text-shadow:
+        0 0 40px  rgba(245, 158, 11, 0.9),
+        0 0 80px  rgba(245, 158, 11, 0.5),
+        0 0 120px rgba(245, 158, 11, 0.2);
+    padding:       30px 20px;
+    background:    linear-gradient(135deg, #0d1526, #1a2235);
+    border:        2px solid var(--gold);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 40px var(--gold-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    letter-spacing: 12px;
+    margin:         0;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ODDS BOARD
+════════════════════════════════════════════════════════════ */
+
+/* Timestamp / horse count row */
+.odds-subheader {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    padding-bottom:  12px;
+    margin-bottom:   4px;
+    border-bottom:   1px solid var(--border);
+    font-size:       0.7rem;
+    color:           var(--text-4);
+}
+
+#oddsUpdated {
+    color:     var(--green);
+    font-size: 0.65rem;
+}
+
+/* Scrollable odds list */
+#runningHorses {
+    list-style:      none;
+    padding:         0;
+    margin:          0;
+    max-height:      520px;
+    overflow-y:      auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+#runningHorses::-webkit-scrollbar       { width: 4px; }
+#runningHorses::-webkit-scrollbar-track { background: transparent; }
+#runningHorses::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius:    4px;
+}
+
+/* Each horse row */
+.leaderboard {
+    border-bottom: 1px solid rgba(45, 55, 72, 0.4);
+    transition:    var(--transition);
+}
+
+.leaderboard:last-child {
+    border-bottom: none;
+}
+
+.leaderboard:hover {
+    background-color: rgba(245, 158, 11, 0.04);
+}
+
+.leaderboard h3 {
+    display:     flex;
+    align-items: center;
+    gap:         0;
+    padding:     9px 4px;
+    font-family: 'Inter', sans-serif;
+    font-size:   0.88rem;
+    font-weight: 500;
+    color:       var(--text-2);
+    margin:      0;
+}
+
+/* Post position number badge */
+.horse-num {
+    display:          inline-flex;
+    align-items:      center;
+    justify-content:  center;
+    background-color: rgba(245, 158, 11, 0.12);
+    color:            var(--gold);
+    border-radius:    var(--radius-sm);
+    font-family:      'Rajdhani', sans-serif;
+    font-size:        0.8rem;
+    font-weight:      700;
+    min-width:        32px;
+    height:           26px;
+    padding:          0 6px;
+    margin-right:     12px;
+    flex-shrink:      0;
+    letter-spacing:   0;
+    transition:       var(--transition);
+}
+
+/* Horse name */
+.horse-name {
+    flex:       1;
+    color:      var(--text-1);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+/* Odds badge */
+.horse-odds {
+    display:          inline-flex;
+    align-items:      center;
+    justify-content:  center;
+    background-color: rgba(16, 185, 129, 0.1);
+    color:            var(--green);
+    border:           1px solid rgba(16, 185, 129, 0.25);
+    border-radius:    var(--radius-sm);
+    font-family:      'Rajdhani', sans-serif;
+    font-size:        0.85rem;
+    font-weight:      700;
+    padding:          2px 10px;
+    letter-spacing:   0.5px;
+    flex-shrink:      0;
+    transition:       var(--transition);
+}
+
+/* ── Taken horse – dimmed and struck through ──────────────── */
+.leaderboard.taken {
+    opacity: 0.3;
+}
+
+.leaderboard.taken .horse-num {
+    background-color: rgba(107, 114, 128, 0.15);
+    color:            var(--text-4);
+}
+
+.leaderboard.taken .horse-name {
+    color:           var(--text-4);
+    text-decoration: line-through;
+}
+
+.leaderboard.taken .horse-odds {
+    background-color: rgba(107, 114, 128, 0.08);
+    color:            var(--text-4);
+    border-color:     rgba(107, 114, 128, 0.15);
+}
+
+/* External link row */
+.odds-link {
+    margin-top:   14px;
+    padding-top:  14px;
+    border-top:   1px solid var(--border);
+    text-align:   right;
+}
+
+.odds-link a {
+    color:       var(--text-4);
+    font-size:   0.72rem;
+    text-decoration: none;
+    display:     inline-flex;
+    align-items: center;
+    gap:         6px;
+    transition:  var(--transition);
+}
+
+.odds-link a:hover {
+    color: var(--gold);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ADMIN CONTROL PANEL
+════════════════════════════════════════════════════════════ */
+
+/* Remove old #control border – handled by card now */
+#control {
+    padding: 0;
+    border:  none;
+    margin:  0;
+}
+
+#adminForm {
+    font-size: 14px;
+    margin:    0;
+}
+
+/* Password input row */
+.admin-input-row {
+    margin-bottom: 16px;
+}
+
+#adminKey2 {
+    width:            100%;
+    background-color: var(--bg-input);
+    border:           2px solid var(--border);
+    border-radius:    var(--radius-sm);
+    color:            var(--text-1);
+    font-size:        0.9rem;
+    font-family:      'Inter', sans-serif;
+    padding:          10px 14px;
+    transition:       var(--transition);
+    outline:          none;
+    height:           auto;
+    display:          block;
+}
+
+#adminKey2:focus {
+    border-color: var(--gold);
+    box-shadow:   0 0 0 3px var(--gold-glow);
+}
+
+#adminKey2::placeholder {
+    color: var(--text-4);
+}
+
+/* Admin button row */
+.admin-btn-row {
+    display:   flex;
+    gap:       12px;
+    flex-wrap: wrap;
+}
+
+.admin-btn-row .button {
+    flex:      1;
+    min-width: 130px;
+    font-size: 0.82rem;
+    height:    46px;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TAKE YOUR SHOT SECTION
+════════════════════════════════════════════════════════════ */
+#TakeShots {
+    text-align:      center;
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    gap:             16px;
+    padding:         16px;
+}
+
+.shots {
+    display:       block;
+    max-width:     100%;
+    height:        auto;
+    border-radius: var(--radius-md);
+    border:        2px solid var(--border);
+    margin:        0 auto;
+    transition:    var(--transition);
+}
+
+.shots:hover {
+    border-color: var(--gold);
+    box-shadow:   0 4px 20px var(--gold-glow);
+}
+
+.SoupShooter {
+    display:       block;
+    max-width:     100%;
+    height:        auto;
+    border-radius: var(--radius-md);
+    border:        2px solid var(--border);
+    margin:        0 auto;
+    transition:    var(--transition);
+}
+
+.SoupShooter:hover {
+    border-color: var(--border-light);
+}
